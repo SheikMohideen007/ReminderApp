@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:notes_application/Db%20services/db_firestore.dart';
 
 class AddNotes extends StatefulWidget {
   const AddNotes({super.key});
@@ -25,6 +26,20 @@ class _AddNotesState extends State<AddNotes> {
         backgroundColor: defaultColor,
         floatingActionButton: FloatingActionButton(
             onPressed: () {
+              String dateStr = date.toString().split(' ')[0],
+                  timeStr = time.toString().split("(")[1].substring(0, 5);
+              if (title.text != "" && description.text != "") {
+                print(title.text);
+                DbFirestore.writeNotes(defaultColor.toString(),
+                    title: title.text,
+                    desc: description.text,
+                    date: dateStr,
+                    time: timeStr);
+              } else {
+                final snack = SnackBar(
+                    content: Text('Title & Description Should not empty'));
+                ScaffoldMessenger.of(context).showSnackBar(snack);
+              }
               Navigator.pop(context);
             },
             child: Icon(Icons.done)),

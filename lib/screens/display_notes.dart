@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:notes_application/Db%20services/db_firestore.dart';
 import 'package:notes_application/screens/add_notes.dart';
 
 class DisplayNotes extends StatefulWidget {
@@ -81,50 +83,82 @@ class _DisplayNotesState extends State<DisplayNotes> {
                 height: devHeight * 0.01,
               ),
               Expanded(
-                child: MasonryGridView.count(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 4,
-                    crossAxisSpacing: 4,
-                    itemCount: mapList.length,
-                    itemBuilder: (context, index) {
-                      Color color = mapList[index]['color'];
-                      return Card(
-                        color: color,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: devWidth * 0.03,
-                              vertical: devHeight * 0.03),
-                          child: Column(
-                            children: [
-                              Text(mapList[index]['title'].toString(),
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20)),
-                              SizedBox(height: 10),
-                              Text(mapList[index]['description'].toString(),
-                                  style: TextStyle(fontSize: 16)),
-                              SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.black, width: 1),
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: Text(
-                                          mapList[index]['dateTime'].toString(),
-                                          style: TextStyle(fontSize: 16)),
+                child: StreamBuilder<QuerySnapshot>(
+                    stream: DbFirestore().fetchNotes(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      int notesLength = snapshot.data!.docs.length;
+                      return MasonryGridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 4,
+                          crossAxisSpacing: 4,
+                          itemCount: notesLength,
+                          itemBuilder: (context, index) {
+                            DocumentSnapshot ds = snapshot.data!.docs[index];
+                            Map note = ds.data() as Map;
+                            String colorStr = note['color'];
+                            colorStr = colorStr.split(":")[1];
+
+                            colorStr =
+                                colorStr.substring(6, colorStr.length - 1);
+
+                            print('colorStr..$colorStr');
+
+                            Color color = colorStr as Color;
+
+                            return Card(
+                              color: Colors.blue,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: devWidth * 0.03,
+                                    vertical: devHeight * 0.03),
+                                child: Column(
+                                  children: [
+                                    Text(note['title'].toString(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20)),
+                                    SizedBox(height: 10),
+                                    Text(note['description'].toString(),
+                                        style: TextStyle(fontSize: 16)),
+                                    SizedBox(height: 15),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: Colors.black,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(6.0),
+                                            child: Text(note['date'].toString(),
+                                                style: TextStyle(fontSize: 16)),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(height: 10),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Text(note['time'],
+                                            style: TextStyle(
+                                                fontSize: 10,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold))
+                                      ],
+                                    )
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
+                            );
+                          });
                     }),
               )
             ],
