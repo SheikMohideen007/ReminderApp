@@ -99,62 +99,71 @@ class _DisplayNotesState extends State<DisplayNotes> {
                             DocumentSnapshot ds = snapshot.data!.docs[index];
                             Map note = ds.data() as Map;
                             String colorStr = note['color'];
-                            colorStr = colorStr.split(":")[1];
+                            Color color = Colors.blue;
+                            try {
+                              colorStr = colorStr.split(":")[1];
+                              colorStr = colorStr.substring(0, colorStr.length);
+                              color = getColor(colorStr);
+                            } catch (e) {
+                              color = getColor(colorStr);
+                            }
 
-                            colorStr =
-                                colorStr.substring(6, colorStr.length - 1);
-
-                            print('colorStr..$colorStr');
-
-                            Color color = colorStr as Color;
-
-                            return Card(
-                              color: Colors.blue,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: devWidth * 0.03,
-                                    vertical: devHeight * 0.03),
-                                child: Column(
-                                  children: [
-                                    Text(note['title'].toString(),
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20)),
-                                    SizedBox(height: 10),
-                                    Text(note['description'].toString(),
-                                        style: TextStyle(fontSize: 16)),
-                                    SizedBox(height: 15),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: Colors.black,
-                                                  width: 1),
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(6.0),
-                                            child: Text(note['date'].toString(),
-                                                style: TextStyle(fontSize: 16)),
+                            return GestureDetector(
+                              onTap: () {
+                                // Read screen
+                              },
+                              child: Card(
+                                color: color,
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: devWidth * 0.03,
+                                      vertical: devHeight * 0.03),
+                                  child: Column(
+                                    children: [
+                                      Text(note['title'].toString(),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20)),
+                                      SizedBox(height: 10),
+                                      Text(note['description'].toString(),
+                                          style: TextStyle(fontSize: 16)),
+                                      SizedBox(height: 15),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                    color: Colors.black,
+                                                    width: 1),
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(6.0),
+                                              child: Text(
+                                                  note['date'].toString(),
+                                                  style:
+                                                      TextStyle(fontSize: 16)),
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(note['time'],
-                                            style: TextStyle(
-                                                fontSize: 10,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold))
-                                      ],
-                                    )
-                                  ],
+                                        ],
+                                      ),
+                                      SizedBox(height: 10),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Text(note['time'],
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold))
+                                        ],
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             );
@@ -166,5 +175,13 @@ class _DisplayNotesState extends State<DisplayNotes> {
         ),
       ),
     );
+  }
+
+  Color getColor(String colorString) {
+    //Extract the hex value
+    String hex = colorString.replaceAll(RegExp(r'[^0-9a-fA-F]'), "");
+    // print("0xffff4081");
+
+    return Color(int.parse(hex, radix: 16));
   }
 }
