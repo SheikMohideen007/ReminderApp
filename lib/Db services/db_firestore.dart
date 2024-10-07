@@ -32,6 +32,26 @@ class DbFirestore {
   }
 
   //update
-  updateNote() {}
+  updateNote(
+      {required String docId,
+      required String title,
+      required String description}) {
+    try {
+      return firestore
+          .collection('Notes')
+          .doc(docId)
+          .update({"title": title, "description": description});
+    } catch (e) {
+      print('$e');
+    }
+  }
+
   //delete
+  deleteNote({required String docId}) {
+    try {
+      return firestore.collection('Notes').doc(docId).delete();
+    } catch (e) {
+      print('$e');
+    }
+  }
 }

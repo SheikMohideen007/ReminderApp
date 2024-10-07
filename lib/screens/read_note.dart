@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:notes_application/Db%20services/db_firestore.dart';
 
 class ReadNote extends StatefulWidget {
   final String title, description, date, time;
@@ -45,13 +46,52 @@ class _ReadNoteState extends State<ReadNote> {
       appBar: AppBar(
         backgroundColor: color,
         actions: [
-          IconButton(onPressed: () {}, icon: Icon(Icons.delete)),
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Are you sure ?'),
+                        content: Text('Do you want to delete this Note?'),
+                        actions: [
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text('No',
+                                  style: TextStyle(color: Colors.red))),
+                          TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                DbFirestore().deleteNote(docId: widget.docId);
+                                final snack =
+                                    SnackBar(content: Text('Note Deleted'));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snack);
+                                Navigator.pop(context);
+                              },
+                              child: Text('Yes',
+                                  style: TextStyle(color: Colors.green))),
+                        ],
+                      );
+                    });
+              },
+              icon: Icon(Icons.delete)),
         ],
       ),
       floatingActionButton: SizedBox(
         width: 100,
         child: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            DbFirestore().updateNote(
+                docId: widget.docId,
+                title: title.text,
+                description: description.text);
+            final snack = SnackBar(content: Text('Note Updated'));
+            ScaffoldMessenger.of(context).showSnackBar(snack);
+            Navigator.pop(context);
+          },
           child: Text('Update'),
         ),
       ),
