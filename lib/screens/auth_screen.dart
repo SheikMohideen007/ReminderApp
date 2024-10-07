@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:notes_application/auth/authentication.dart';
+import 'package:notes_application/screens/display_notes.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -12,6 +13,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   TextEditingController email = TextEditingController();
   TextEditingController password = TextEditingController();
+  bool isRegister = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +23,7 @@ class _AuthScreenState extends State<AuthScreen> {
           child: Column(
             children: [
               SizedBox(height: 300),
-              Text('Sign in',
+              Text(isRegister ? 'Sign in' : 'Sign up',
                   style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
               SizedBox(height: 50),
               TextField(
@@ -46,16 +48,37 @@ class _AuthScreenState extends State<AuthScreen> {
                     print(email.text);
                     print(password.text);
                     if (email.text != "" && password.text != "") {
-                      User? user = await AuthService().signInWithEmailPassword(
-                          email.text.trim(), password.text.trim());
+                      User? user;
+                      if (isRegister == true) {
+                        user = await AuthService().signInWithEmailPassword(
+                            email.text.trim(), password.text.trim());
+                      } else {
+                        user = await AuthService().signUpWithEmailPassword(
+                            email.text.trim(), password.text.trim());
+                      }
+
                       if (user != null) {
                         print('Signed in as ${user.email}');
                       } else {
                         print('Sign in Failed');
+                        final snack = SnackBar(
+                          content: Text("You don't have an account"),
+                          action: SnackBarAction(
+                              label: 'Sign up',
+                              onPressed: () {
+                                setState(() {
+                                  isRegister = false;
+                                });
+                              }),
+                        );
+                        email.clear();
+                        password.clear();
+
+                        ScaffoldMessenger.of(context).showSnackBar(snack);
                       }
                     }
                   },
-                  child: Text('Sign in'))
+                  child: Text(isRegister ? 'Sign in' : 'Sign up'))
             ],
           ),
         ),

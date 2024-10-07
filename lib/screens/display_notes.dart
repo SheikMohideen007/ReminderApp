@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:notes_application/Db%20services/db_firestore.dart';
+import 'package:notes_application/auth/authentication.dart';
 import 'package:notes_application/screens/add_notes.dart';
+import 'package:notes_application/screens/read_note.dart';
 
 class DisplayNotes extends StatefulWidget {
   const DisplayNotes({super.key});
@@ -67,8 +69,10 @@ class _DisplayNotesState extends State<DisplayNotes> {
                       width: devWidth * 0.14,
                       child: Image.asset('images/profile.png')),
                   IconButton(
-                      onPressed: () async {},
-                      icon: Icon(Icons.search, size: 35))
+                      onPressed: () async {
+                        AuthService().signOut();
+                      },
+                      icon: Icon(Icons.logout, size: 35))
                 ],
               ),
               Row(
@@ -97,6 +101,7 @@ class _DisplayNotesState extends State<DisplayNotes> {
                           itemCount: notesLength,
                           itemBuilder: (context, index) {
                             DocumentSnapshot ds = snapshot.data!.docs[index];
+                            String docId = ds.id;
                             Map note = ds.data() as Map;
                             String colorStr = note['color'];
                             Color color = Colors.blue;
@@ -111,6 +116,17 @@ class _DisplayNotesState extends State<DisplayNotes> {
                             return GestureDetector(
                               onTap: () {
                                 // Read screen
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ReadNote(
+                                              title: note['title'],
+                                              description: note['description'],
+                                              date: note['date'],
+                                              time: note['time'],
+                                              color: color,
+                                              docId: docId,
+                                            )));
                               },
                               child: Card(
                                 color: color,

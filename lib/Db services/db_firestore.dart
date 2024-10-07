@@ -30,4 +30,8 @@ class DbFirestore {
       print('Problem is $e');
     }
   }
+
+  //update
+  updateNote() {}
+  //delete
 }

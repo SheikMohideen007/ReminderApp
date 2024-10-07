@@ -8,6 +8,17 @@ class AuthService {
       UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email, password: password);
       return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print('$e');
+      return null;
+    }
+  }
+
+  Future<User?> signUpWithEmailPassword(String email, String password) async {
+    try {
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+      return userCredential.user;
     } catch (e) {
       print('$e');
       return null;
@@ -21,5 +32,11 @@ class AuthService {
     } catch (e) {
       print('$e');
     }
+  }
+
+  //stream the authentication status whether (signed in or signed out)
+
+  Stream<User?> checkingAuthStatus() {
+    return auth.authStateChanges();
   }
 }
