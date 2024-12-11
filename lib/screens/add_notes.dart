@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:notes_application/Db%20services/db_firestore.dart';
 
 class AddNotes extends StatefulWidget {
+  //hello
   const AddNotes({super.key});
 
   @override
